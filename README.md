@@ -67,15 +67,16 @@ classDiagram
 
 ## 📋 Rastreabilidade de Requisitos
 
-| HU | História de Usuário | Classe(s) | Método de Implementação |
-| **HU01** | Adicionar novo livro ao acervo | Dono | `cadastrarLivro(Livro)` |
-| **HU02** | Visualizar lista completa de livros | Membro | `consultarAcervo()` |
-| **HU03** | Registrar empréstimo de um livro | Emprestimo | `processarEmprestimo(Livro, Membro)` |
-| **HU04** | Registrar devolução de um livro | Emprestimo | `finalizarDevolucao()` |
-| **HU05** | "Buscar livros por título, autor ou ISBN " | Membro | `consultarAcervo()` |
-| **HU06** | Visualizar livros emprestados e contatos | Dono | `visualizarRelatorioEmprestados()` |
-| **HU07** | Gerenciar lista de membros | Dono | `gerenciarMembros()` |
-| **HU08** | Editar detalhes de um livro | Dono | `editarLivro(Livro)` |
-| **HU09** | Filtrar lista por status | Membro | `consultarAcervo()` |
+| HU       | História de Usuário                        | Classe(s)  | Método de Implementação              |
+| -------- | ------------------------------------------ | ---------- | ------------------------------------ |
+| **HU01** | Adicionar novo livro ao acervo             | Dono       | `cadastrarLivro(Livro)`              |
+| **HU02** | Visualizar lista completa de livros        | Membro     | `consultarAcervo()`                  |
+| **HU03** | Registrar empréstimo de um livro           | Emprestimo | `processarEmprestimo(Livro, Membro)` |
+| **HU04** | Registrar devolução de um livro            | Emprestimo | `finalizarDevolucao()`               |
+| **HU05** | "Buscar livros por título, autor ou ISBN " | Membro     | `consultarAcervo()`                  |
+| **HU06** | Visualizar livros emprestados e contatos   | Dono       | `visualizarRelatorioEmprestados()`   |
+| **HU07** | Gerenciar lista de membros                 | Dono       | `gerenciarMembros()`                 |
+| **HU08** | Editar detalhes de um livro                | Dono       | `editarLivro(Livro)`                 |
+| **HU09** | Filtrar lista por status                   | Membro     | `consultarAcervo()`                  |
 
 ---
