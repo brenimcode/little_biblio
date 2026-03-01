@@ -2,6 +2,11 @@
 
 > Sistema simplificado para gestão de coleções físicas de livros.
 
+Este protótipo é um Mínimo Viável Produto (MVP) focado na validação da lógica de acervo e empréstimos. Para acelerar a prova de valor, foram adotadas as seguintes definições de escopo:
+- Acesso Aberto (Full Admin): Não há módulos de login ou cadastro. Todo usuário possui permissões totais de administrador, podendo gerenciar livros, membros e transações.
+- Ambiente Único: O sistema é single-tenant, ou seja, não há separação entre diferentes bibliotecas. Todos os dados pertencem a um único contexto compartilhado.
+- Foco Funcional: Itens como monetização e segurança avançada foram omitidos para priorizar a experiência de rastreabilidade e usabilidade do core do produto.
+
 ## 🛠 Stack Tecnológica
 
 - **Front-End:** ReactJS (Interface reativa e intuitiva)
