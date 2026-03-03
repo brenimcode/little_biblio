@@ -27,8 +27,8 @@ const BooksPage = () => {
 
   const filtered = books.filter((b) => {
     const matchesSearch =
-      b.title.toLowerCase().includes(search.toLowerCase()) ||
-      b.author.toLowerCase().includes(search.toLowerCase()) ||
+      b.titulo.toLowerCase().includes(search.toLowerCase()) ||
+      b.autor.toLowerCase().includes(search.toLowerCase()) ||
       b.isbn.includes(search);
     const matchesStatus = statusFilter === "all" || b.status === statusFilter;
     return matchesSearch && matchesStatus;
