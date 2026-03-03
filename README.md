@@ -84,4 +84,16 @@ classDiagram
 | **HU08** | Editar detalhes de um livro                | Dono       | `editarLivro(Livro)`                 |
 | **HU09** | Filtrar lista por status                   | Membro     | `consultarAcervo()`                  |
 
----
+
+## 🧪 Testes e Boas Práticas de Engenharia de Software
+
+Este projeto foi desenvolvido seguindo princípios fundamentais da Engenharia de Software:
+
+- **Testes Automatizados:** Utilizamos testes unitários e de integração para garantir a confiabilidade das principais funcionalidades do sistema, tanto no backend (FastAPI) quanto no frontend (React). Os testes cobrem cenários de API, modelos e componentes, favorecendo a manutenção e evolução segura do código.
+- **Arquitetura Limpa:** O backend foi desenhado com inspiração na Clean Architecture, promovendo separação clara entre camadas de domínio, aplicação, infraestrutura e interfaces. Isso facilita a testabilidade, reuso e independência de frameworks.
+- **Design em Camadas:** O sistema adota conceitos de arquitetura em camadas, separando responsabilidades entre modelos, serviços, roteadores e schemas. Essa abordagem favorece a organização, escalabilidade e clareza do código.
+- **Separação de Classes:** As entidades principais (Livro, Membro, Emprestimo) são representadas por classes bem definidas, cada uma com suas responsabilidades e métodos, conforme boas práticas de orientação a objetos.
+- **Documentação e Rastreabilidade:** O projeto inclui documentação detalhada, diagramas de classes e rastreabilidade de requisitos, facilitando o entendimento e acompanhamento do desenvolvimento.
+- **Princípios SOLID e DRY:** Buscamos aplicar princípios como SOLID (responsabilidade única, aberto/fechado, etc.) e DRY (não se repita) para garantir um código limpo, modular e de fácil manutenção.
+
+Essas práticas foram adotadas para favorecer a qualidade, robustez e evolução do projeto, alinhando-se aos objetivos da disciplina de Engenharia de Software.
