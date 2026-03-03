@@ -1,26 +1,32 @@
+export type Status = "DISPONIVEL" | "EMPRESTADO";
+
 export interface Book {
-  id: string;
-  title: string;
-  author: string;
+  id: number;
   isbn: string;
-  coverUrl: string;
-  status: "available" | "borrowed";
-  createdAt: string;
+  titulo: string;
+  autor: string;
+  capa_url?: string | null;
+  status: Status;
 }
 
 export interface Member {
-  id: string;
-  name: string;
-  phone: string;
+  id: number;
+  nome: string;
   email: string;
-  createdAt: string;
+  telefone: string;
 }
 
 export interface Loan {
-  id: string;
-  bookId: string;
-  memberId: string;
-  loanDate: string;
-  returnDate: string | null;
-  active: boolean;
+  id: number;
+  livro_id: number;
+  membro_id: number;
+  data_emprestimo: string;
+  data_devolucao_prevista: string;
+  data_devolucao_real?: string | null;
+}
+
+export interface RelatorioEmprestimo {
+  titulo: string;
+  nome_membro: string;
+  telefone: string;
 }

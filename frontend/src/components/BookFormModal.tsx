@@ -25,10 +25,10 @@ export function BookFormModal({ open, onClose, book }: Props) {
 
   useEffect(() => {
     if (book) {
-      setTitle(book.title);
-      setAuthor(book.author);
+      setTitle(book.titulo);
+      setAuthor(book.autor);
       setIsbn(book.isbn);
-      setCoverUrl(book.coverUrl);
+      setCoverUrl(book.capa_url ?? "");
     } else {
       setTitle("");
       setAuthor("");
@@ -39,10 +39,17 @@ export function BookFormModal({ open, onClose, book }: Props) {
 
   const handleSubmit = () => {
     if (!title.trim() || !author.trim()) return;
+    const payload = {
+      titulo: title,
+      autor: author,
+      isbn,
+      capa_url: coverUrl,
+      status: "DISPONIVEL" as const
+    };
     if (isEdit) {
-      updateBook(book.id, { title, author, isbn, coverUrl });
+      updateBook(book.id, payload);
     } else {
-      addBook({ title, author, isbn, coverUrl });
+      addBook(payload);
     }
     onClose();
   };

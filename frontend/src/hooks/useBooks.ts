@@ -1,35 +1,86 @@
-import { useLocalStorage } from "./useLocalStorage";
+import { useEffect, useState } from "react";
 import { Book } from "@/types";
 
-const SEED_BOOKS: Book[] = [
-  { id: "b1", title: "Dom Casmurro", author: "Machado de Assis", isbn: "978-8535910681", coverUrl: "", status: "available", createdAt: "2024-01-10" },
-  { id: "b2", title: "O Pequeno Príncipe", author: "Antoine de Saint-Exupéry", isbn: "978-8595081512", coverUrl: "", status: "borrowed", createdAt: "2024-01-12" },
-  { id: "b3", title: "1984", author: "George Orwell", isbn: "978-8535914849", coverUrl: "", status: "available", createdAt: "2024-02-01" },
-  { id: "b4", title: "Sapiens", author: "Yuval Noah Harari", isbn: "978-8525432186", coverUrl: "", status: "available", createdAt: "2024-02-15" },
-  { id: "b5", title: "A Revolução dos Bichos", author: "George Orwell", isbn: "978-8535909555", coverUrl: "", status: "borrowed", createdAt: "2024-03-01" },
-];
+const API_URL = "http://localhost:8080/livros";
 
 export function useBooks() {
-  const [books, setBooks] = useLocalStorage<Book[]>("littlebiblio_books", SEED_BOOKS);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const addBook = (book: Omit<Book, "id" | "createdAt" | "status">) => {
-    const newBook: Book = {
-      ...book,
-      id: crypto.randomUUID(),
-      status: "available",
-      createdAt: new Date().toISOString(),
-    };
-    setBooks((prev) => [...prev, newBook]);
-    return newBook;
+  useEffect(() => {
+    setLoading(true);
+    fetch(API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro ao buscar livros");
+        return res.json();
+      })
+      .then(setBooks)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const addBook = async (book: Omit<Book, "id" | "createdAt">) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Monta o payload conforme LivroCreate
+      const payload: any = {
+        isbn: book.isbn,
+        titulo: book.titulo,
+        autor: book.autor,
+        status: book.status ?? "DISPONIVEL"
+      };
+      if (book.capa_url) {
+        payload.capa_url = book.capa_url;
+      }
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Erro ao cadastrar livro");
+      const newBook = await res.json();
+      setBooks((prev) => [...prev, newBook]);
+      return newBook;
+    } catch (err: any) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateBook = (id: string, data: Partial<Book>) => {
-    setBooks((prev) => prev.map((b) => (b.id === id ? { ...b, ...data } : b)));
+  const updateBook = async (id: number, data: Partial<Book>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Monta o payload conforme LivroUpdate
+      const payload = {
+        isbn: data.isbn,
+        titulo: data.titulo,
+        autor: data.autor,
+        capa_url: data.capa_url ?? null,
+        status: data.status ?? "DISPONIVEL"
+      };
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Erro ao atualizar livro");
+      const updated = await res.json();
+      setBooks((prev) => prev.map((b) => (b.id === id ? updated : b)));
+      return updated;
+    } catch (err: any) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteBook = (id: string) => {
-    setBooks((prev) => prev.filter((b) => b.id !== id));
-  };
+  // Remoção não está implementada no backend, mas pode ser adicionada futuramente
 
-  return { books, addBook, updateBook, deleteBook };
+  return { books, addBook, updateBook, loading, error };
 }

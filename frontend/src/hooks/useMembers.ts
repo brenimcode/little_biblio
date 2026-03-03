@@ -1,32 +1,53 @@
-import { useLocalStorage } from "./useLocalStorage";
+import { useEffect, useState } from "react";
 import { Member } from "@/types";
 
-const SEED_MEMBERS: Member[] = [
-  { id: "m1", name: "Ana Silva", phone: "(11) 98765-4321", email: "ana@email.com", createdAt: "2024-01-10" },
-  { id: "m2", name: "Carlos Souza", phone: "(21) 91234-5678", email: "carlos@email.com", createdAt: "2024-01-15" },
-  { id: "m3", name: "Beatriz Lima", phone: "(31) 99876-5432", email: "bia@email.com", createdAt: "2024-02-01" },
-];
+const API_URL = "http://localhost:8080/membros";
 
 export function useMembers() {
-  const [members, setMembers] = useLocalStorage<Member[]>("littlebiblio_members", SEED_MEMBERS);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const addMember = (member: Omit<Member, "id" | "createdAt">) => {
-    const newMember: Member = {
-      ...member,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-    };
-    setMembers((prev) => [...prev, newMember]);
-    return newMember;
+  useEffect(() => {
+    setLoading(true);
+    fetch(API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro ao buscar membros");
+        return res.json();
+      })
+      .then(setMembers)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const addMember = async (member: Omit<Member, "id" | "createdAt">) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Monta o payload conforme MembroCreate
+      const payload = {
+        nome: member.nome,
+        email: member.email,
+        telefone: member.telefone
+      };
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Erro ao cadastrar membro");
+      const newMember = await res.json();
+      setMembers((prev) => [...prev, newMember]);
+      return newMember;
+    } catch (err: any) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateMember = (id: string, data: Partial<Member>) => {
-    setMembers((prev) => prev.map((m) => (m.id === id ? { ...m, ...data } : m)));
-  };
+  // update/delete não implementados no backend
 
-  const deleteMember = (id: string) => {
-    setMembers((prev) => prev.filter((m) => m.id !== id));
-  };
-
-  return { members, addMember, updateMember, deleteMember };
+  return { members, addMember, loading, error };
 }

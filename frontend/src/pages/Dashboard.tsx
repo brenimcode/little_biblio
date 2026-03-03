@@ -11,14 +11,18 @@ const Dashboard = () => {
   const { books, members, activeLoans, loans } = useLibrary();
   const navigate = useNavigate();
 
-  const availableBooks = books.filter((b) => b.status === "available").length;
-  const borrowedBooks = books.filter((b) => b.status === "borrowed").length;
+  const safeBooks = Array.isArray(books) ? books : [];
+  const safeMembers = Array.isArray(members) ? members : [];
+  const safeActiveLoans = Array.isArray(activeLoans) ? activeLoans : [];
+
+  const availableBooks = safeBooks.filter((b) => b.status === "DISPONIVEL").length;
+  const borrowedBooks = safeBooks.filter((b) => b.status === "EMPRESTADO").length;
 
   const stats = [
-    { label: "Total de Livros", value: books.length, icon: BookOpen, color: "text-primary" },
+    { label: "Total de Livros", value: safeBooks.length, icon: BookOpen, color: "text-primary" },
     { label: "Disponíveis", value: availableBooks, icon: BookCheck, color: "text-primary" },
     { label: "Emprestados", value: borrowedBooks, icon: ArrowLeftRight, color: "text-accent" },
-    { label: "Membros", value: members.length, icon: Users, color: "text-accent" },
+    { label: "Membros", value: safeMembers.length, icon: Users, color: "text-accent" },
   ];
 
   return (
@@ -55,7 +59,7 @@ const Dashboard = () => {
       {/* Active loans list */}
       <div>
         <h2 className="mb-4 text-lg font-semibold">Empréstimos Ativos</h2>
-        {activeLoans.length === 0 ? (
+        {safeActiveLoans.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center text-muted-foreground">
               Nenhum empréstimo ativo no momento.
@@ -64,17 +68,17 @@ const Dashboard = () => {
         ) : (
           <div className="space-y-2">
             {activeLoans.map((loan) => {
-              const book = books.find((b) => b.id === loan.bookId);
-              const member = members.find((m) => m.id === loan.memberId);
+              const book = books.find((b) => b.id === loan.livro_id);
+              const member = members.find((m) => m.id === loan.membro_id);
               return (
                 <Card key={loan.id}>
                   <CardContent className="flex items-center justify-between p-4">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{book?.title ?? "Livro removido"}</p>
+                      <p className="truncate font-medium">{book?.titulo ?? "Livro removido"}</p>
                       <p className="text-sm text-muted-foreground">
-                        com <span className="font-medium text-foreground">{member?.name ?? "—"}</span>
+                        com <span className="font-medium text-foreground">{member?.nome ?? "—"}</span>
                         {" · "}
-                        {format(new Date(loan.loanDate), "dd MMM yyyy", { locale: ptBR })}
+                        {format(new Date(loan.data_emprestimo), "dd MMM yyyy", { locale: ptBR })}
                       </p>
                     </div>
                     <Badge variant="secondary" className="ml-2 shrink-0">Emprestado</Badge>

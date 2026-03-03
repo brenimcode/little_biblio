@@ -1,36 +1,71 @@
-import { useLocalStorage } from "./useLocalStorage";
+import { useEffect, useState } from "react";
 import { Loan } from "@/types";
 
-const SEED_LOANS: Loan[] = [
-  { id: "l1", bookId: "b2", memberId: "m1", loanDate: "2024-06-10", returnDate: null, active: true },
-  { id: "l2", bookId: "b5", memberId: "m2", loanDate: "2024-06-15", returnDate: null, active: true },
-];
+const API_URL = "http://localhost:8080/emprestimos";
 
 export function useLoans() {
-  const [loans, setLoans] = useLocalStorage<Loan[]>("littlebiblio_loans", SEED_LOANS);
+  const [loans, setLoans] = useState<Loan[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const addLoan = (bookId: string, memberId: string) => {
-    const newLoan: Loan = {
-      id: crypto.randomUUID(),
-      bookId,
-      memberId,
-      loanDate: new Date().toISOString(),
-      returnDate: null,
-      active: true,
-    };
-    setLoans((prev) => [...prev, newLoan]);
-    return newLoan;
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API_URL}/relatorio`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro ao buscar empréstimos");
+        return res.json();
+      })
+      .then(setLoans)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const addLoan = async (loanData: { livro_id: number; membro_id: number; data_devolucao_prevista: string }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Monta o payload conforme EmprestimoCreate
+      const payload = {
+        livro_id: loanData.livro_id,
+        membro_id: loanData.membro_id,
+        data_devolucao_prevista: loanData.data_devolucao_prevista
+      };
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Erro ao registrar empréstimo");
+      const newLoan = await res.json();
+      setLoans((prev) => [...prev, newLoan]);
+      return newLoan;
+    } catch (err: any) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const returnLoan = (loanId: string) => {
-    setLoans((prev) =>
-      prev.map((l) =>
-        l.id === loanId ? { ...l, active: false, returnDate: new Date().toISOString() } : l
-      )
-    );
+  const returnLoan = async (id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_URL}/${id}/devolucao`, {
+        method: "PATCH",
+      });
+      if (!res.ok) throw new Error("Erro ao finalizar devolução");
+      const updatedLoan = await res.json();
+      setLoans((prev) => prev.map((l) => (l.id === id ? updatedLoan : l)));
+      return updatedLoan;
+    } catch (err: any) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const activeLoans = loans.filter((l) => l.active);
-
-  return { loans, activeLoans, addLoan, returnLoan };
+  const activeLoans = Array.isArray(loans) ? loans.filter((l) => !l.data_devolucao_real) : [];
+  return { loans, activeLoans, addLoan, returnLoan, loading, error };
 }
