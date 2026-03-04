@@ -97,3 +97,64 @@ Este projeto foi desenvolvido seguindo princípios fundamentais da Engenharia de
 - **Princípios SOLID e DRY:** Buscamos aplicar princípios como SOLID (responsabilidade única, aberto/fechado, etc.) e DRY (não se repita) para garantir um código limpo, modular e de fácil manutenção.
 
 Essas práticas foram adotadas para favorecer a qualidade, robustez e evolução do projeto, alinhando-se aos objetivos da disciplina de Engenharia de Software.
+
+## 🚀 Como Rodar?
+
+Para executar o projeto localmente, siga os passos abaixo:
+
+## 1. Banco de Dados (PostgreSQL)
+
+- Certifique-se de ter o PostgreSQL & Docker instalado e rodando na sua máquina.
+- Crie o banco de dados conforme especificado no backend.
+
+## 2. Backend (FastAPI)
+
+- Acesse a pasta do backend:
+    ```bash
+    cd backend
+    ```
+- Instale as dependências:
+    ```bash
+    # Crie e ative o ambiente virtual
+    python -m venv venv
+    venv\Scripts\activate  # No Windows
+    source venv/bin/activate  # No Linux/Mac
+    
+    pip install -r requirements.txt
+    ```
+
+- Execute o Docker Compose para subir o PostgreSQL:
+    ```bash
+    docker compose up -d
+    ```
+    
+- Execute a criação do banco (se necessário):
+    ```bash
+    python create_db.py
+    ```
+- Inicie o servidor FastAPI:
+    ```bash
+    python start.py
+    ```
+
+## 3. Frontend (React)
+
+- Acesse a pasta do frontend:
+    ```bash
+    cd frontend
+    ```
+- Instale as dependências:
+    ```bash
+    npm install
+    ```
+- Inicie o servidor de desenvolvimento:
+    ```bash
+    npm run dev
+    ```
+
+## 4. Acessando o Sistema
+
+- O frontend estará disponível em `http://localhost:8081` (ou porta configurada).
+- O backend estará disponível em `http://localhost:8080` (ou porta configurada).
+
+Pronto! Agora você pode acessar e utilizar o sistema Little Biblio localmente.
