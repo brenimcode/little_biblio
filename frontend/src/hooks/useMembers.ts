@@ -47,7 +47,47 @@ export function useMembers() {
     }
   };
 
-  // update/delete não implementados no backend
+  const updateMember = async (id: number, data: Partial<Member>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        nome: data.nome,
+        telefone: data.telefone,
+        email: data.email
+      };
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Erro ao atualizar membro");
+      const updated = await res.json();
+      setMembers((prev) => prev.map((m) => (m.id === id ? updated : m)));
+      return updated;
+    } catch (err: any) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return { members, addMember, loading, error };
+  const deleteMember = async (id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+      });
+      if (!res.ok) throw new Error("Erro ao deletar membro");
+      setMembers((prev) => prev.filter((m) => m.id !== id));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { members, addMember, updateMember, deleteMember, loading, error };
 }

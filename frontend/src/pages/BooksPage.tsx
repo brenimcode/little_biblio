@@ -11,11 +11,11 @@ import { BookFormModal } from "@/components/BookFormModal";
 import { LoanModal } from "@/components/LoanModal";
 import { ReturnDialog } from "@/components/ReturnDialog";
 
-const statusFilters = ["all", "available", "borrowed"] as const;
-const statusLabels = { all: "Todos", available: "Disponíveis", borrowed: "Emprestados" };
+const statusFilters = ["all", "DISPONIVEL", "EMPRESTADO"] as const;
+const statusLabels = { all: "Todos", DISPONIVEL: "Disponíveis", EMPRESTADO: "Emprestados" };
 
 const BooksPage = () => {
-  const { books, deleteBook, activeLoans, members } = useLibrary();
+  const { books, deleteBook, activeLoans, members, returnLoan, loading: loanLoading } = useLibrary();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("all");
@@ -34,10 +34,10 @@ const BooksPage = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const getLoanInfo = (bookId: string) => {
-    const loan = activeLoans.find((l) => l.bookId === bookId);
+  const getLoanInfo = (bookId: number) => {
+    const loan = activeLoans.find((l) => l.livro_id === bookId);
     if (!loan) return null;
-    const member = members.find((m) => m.id === loan.memberId);
+    const member = members.find((m) => m.id === loan.membro_id);
     return { loan, member };
   };
 
@@ -85,37 +85,52 @@ const BooksPage = () => {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((book) => {
-            const loanInfo = getLoanInfo(book.id);
+            const loan = activeLoans.find((l) => l.livro_id === book.id);
+            const member = loan ? members.find((m) => m.id === loan.membro_id) : null;
             return (
               <Card key={book.id} className="overflow-hidden">
                 <div className="flex h-32 items-center justify-center bg-secondary">
-                  {book.coverUrl ? (
-                    <img src={book.coverUrl} alt={book.title} className="h-full w-full object-cover" />
+                  {book.capa_url ? (
+                    <img src={book.capa_url} alt={book.titulo} className="h-full w-full object-cover" />
                   ) : (
                     <BookOpen className="h-10 w-10 text-muted-foreground" />
                   )}
                 </div>
                 <CardContent className="p-4">
                   <div className="mb-1 flex items-start justify-between gap-2">
-                    <h3 className="line-clamp-1 font-semibold">{book.title}</h3>
-                    <Badge variant={book.status === "available" ? "default" : "secondary"} className="shrink-0 text-xs">
-                      {book.status === "available" ? "Disponível" : "Emprestado"}
-                    </Badge>
+                    <h3 className="line-clamp-1 font-semibold">{book.titulo}</h3>
+                    <span className={
+                      book.status === "DISPONIVEL"
+                        ? "bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-semibold"
+                        : "bg-orange-100 text-orange-800 px-2 py-0.5 rounded text-xs font-semibold"
+                    }>
+                      {book.status === "DISPONIVEL" ? "Disponível" : "Emprestado"}
+                    </span>
                   </div>
-                  <p className="mb-3 text-sm text-muted-foreground">{book.author}</p>
-                  {loanInfo && (
+                  <p className="mb-3 text-sm text-muted-foreground">{book.autor}</p>
+                  {book.status === "EMPRESTADO" && member && (
                     <p className="mb-3 text-xs text-muted-foreground">
-                      Com: <span className="font-medium text-foreground">{loanInfo.member?.name}</span>
+                      Com: <span className="font-medium text-foreground">{member.nome}</span>
                     </p>
                   )}
                   <div className="flex gap-2">
-                    {book.status === "available" ? (
+                    {book.status === "DISPONIVEL" ? (
                       <Button size="sm" className="flex-1" onClick={() => setLoanBook(book)}>
                         Emprestar
                       </Button>
                     ) : (
-                      <Button size="sm" variant="secondary" className="flex-1" onClick={() => setReturnBook(book)}>
-                        Devolver
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="flex-1"
+                        disabled={loanLoading}
+                        onClick={async () => {
+                          if (!loan) return;
+                          await returnLoan(loan.id);
+                          alert("Livro devolvido com sucesso e agora está disponível no acervo!");
+                        }}
+                      >
+                        {loanLoading ? "Devolvendo..." : "Devolver"}
                       </Button>
                     )}
                     <Button size="icon" variant="ghost" onClick={() => setEditBook(book)}>

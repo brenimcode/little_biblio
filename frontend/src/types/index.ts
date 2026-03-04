@@ -17,12 +17,16 @@ export interface Member {
 }
 
 export interface Loan {
-  id: number;
-  livro_id: number;
-  membro_id: number;
+  id?: number;
+  livro_id?: number;
+  membro_id?: number;
   data_emprestimo: string;
-  data_devolucao_prevista: string;
+  data_devolucao_prevista?: string;
   data_devolucao_real?: string | null;
+  // Campos do RelatorioEmprestimo
+  titulo: string;
+  nome_membro: string;
+  telefone: string;
 }
 
 export interface RelatorioEmprestimo {

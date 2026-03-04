@@ -20,8 +20,15 @@ export function LoanModal({ open, onClose, book }: Props) {
 
   const handleConfirm = () => {
     if (!book || !memberId) return;
-    addLoan(book.id, memberId);
-    updateBook(book.id, { status: "borrowed" });
+    // Define data_devolucao_prevista para daqui 7 dias
+    const dataDevolucaoPrevista = new Date();
+    dataDevolucaoPrevista.setDate(dataDevolucaoPrevista.getDate() + 7);
+    const payload = {
+      livro_id: book.id,
+      membro_id: Number(memberId),
+      data_devolucao_prevista: dataDevolucaoPrevista.toISOString()
+    };
+    addLoan(payload);
     setMemberId("");
     onClose();
   };
@@ -32,7 +39,7 @@ export function LoanModal({ open, onClose, book }: Props) {
         <DialogHeader>
           <DialogTitle>Registrar Empréstimo</DialogTitle>
           <DialogDescription>
-            Escolha o membro que vai levar o livro <span className="font-medium">"{book?.title}"</span>.
+            Escolha o membro que vai levar o livro <span className="font-medium">"{book?.titulo}"</span>.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -44,7 +51,7 @@ export function LoanModal({ open, onClose, book }: Props) {
               </SelectTrigger>
               <SelectContent>
                 {members.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                  <SelectItem key={m.id} value={String(m.id)}>{m.nome}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

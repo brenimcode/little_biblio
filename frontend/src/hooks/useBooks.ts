@@ -80,7 +80,21 @@ export function useBooks() {
     }
   };
 
-  // Remoção não está implementada no backend, mas pode ser adicionada futuramente
+  const deleteBook = async (id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+      });
+      if (!res.ok) throw new Error("Erro ao deletar livro");
+      setBooks((prev) => prev.filter((b) => b.id !== id));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return { books, addBook, updateBook, loading, error };
+  return { books, addBook, updateBook, deleteBook, loading, error };
 }

@@ -47,7 +47,7 @@ export function BookFormModal({ open, onClose, book }: Props) {
       status: "DISPONIVEL" as const
     };
     if (isEdit) {
-      updateBook(book.id, payload);
+      updateBook(book.id, { ...payload, status: book.status });
     } else {
       addBook(payload);
     }

@@ -24,8 +24,8 @@ export function MemberFormModal({ open, onClose, member }: Props) {
 
   useEffect(() => {
     if (member) {
-      setName(member.name);
-      setPhone(member.phone);
+      setName(member.nome);
+      setPhone(member.telefone);
       setEmail(member.email);
     } else {
       setName("");
@@ -36,10 +36,15 @@ export function MemberFormModal({ open, onClose, member }: Props) {
 
   const handleSubmit = () => {
     if (!name.trim()) return;
+    const payload = {
+      nome: name,
+      telefone: phone,
+      email: email
+    };
     if (isEdit) {
-      updateMember(member.id, { name, phone, email });
+      updateMember(member.id, payload);
     } else {
-      addMember({ name, phone, email });
+      addMember(payload);
     }
     onClose();
   };

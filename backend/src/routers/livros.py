@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from src.database import SessionLocal
 from src.schemas.schemas import LivroCreate, LivroUpdate, LivroOut, StatusEnum
-from src.services.services import criar_livro, listar_livros, atualizar_livro
+from src.services.services import criar_livro, listar_livros, atualizar_livro, deletar_livro
 from typing import List, Optional
 
 def get_db():
@@ -31,3 +31,8 @@ def get_livros(
 @router.put("/{id}", response_model=LivroOut)
 def put_livro(id: int, livro: LivroUpdate, db: Session = Depends(get_db)):
     return atualizar_livro(db, id, livro)
+
+
+@router.delete("/{id}", status_code=204)
+def delete_livro(id: int, db: Session = Depends(get_db)):
+    return deletar_livro(db, id)

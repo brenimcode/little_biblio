@@ -59,3 +59,4 @@ class RelatorioEmprestimo(BaseModel):
     titulo: str
     nome_membro: str
     telefone: str
+    data_emprestimo: datetime

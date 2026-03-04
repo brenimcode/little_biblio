@@ -67,18 +67,23 @@ const Dashboard = () => {
           </Card>
         ) : (
           <div className="space-y-2">
-            {activeLoans.map((loan) => {
-              const book = books.find((b) => b.id === loan.livro_id);
-              const member = members.find((m) => m.id === loan.membro_id);
+            {activeLoans.map((loan, idx) => {
+              let dataEmprestimoStr = "";
+              const dataObj = new Date(loan.data_emprestimo);
+              if (loan.data_emprestimo && !isNaN(dataObj.getTime())) {
+                dataEmprestimoStr = format(dataObj, "dd MMM yyyy", { locale: ptBR });
+              } else {
+                dataEmprestimoStr = "Data inválida";
+              }
               return (
-                <Card key={loan.id}>
+                <Card key={idx}>
                   <CardContent className="flex items-center justify-between p-4">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{book?.titulo ?? "Livro removido"}</p>
+                      <p className="truncate font-medium">{loan.titulo ?? "Livro removido"}</p>
                       <p className="text-sm text-muted-foreground">
-                        com <span className="font-medium text-foreground">{member?.nome ?? "—"}</span>
+                        com <span className="font-medium text-foreground">{loan.nome_membro ?? "—"}</span>
                         {" · "}
-                        {format(new Date(loan.data_emprestimo), "dd MMM yyyy", { locale: ptBR })}
+                        {dataEmprestimoStr}
                       </p>
                     </div>
                     <Badge variant="secondary" className="ml-2 shrink-0">Emprestado</Badge>

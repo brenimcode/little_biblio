@@ -45,7 +45,56 @@ def criar_membro(db: Session, membro: MembroCreate):
 def listar_membros(db: Session):
     return db.query(Membro).all()
 
-# Emprestimo Services
+# Livro Services
+def deletar_livro(db: Session, livro_id: int):
+    # 1. Busca o livro pelo ID
+    db_livro = db.query(Livro).filter(Livro.id == livro_id).first()
+    
+    # 2. Erro 404 se o livro não existir
+    if not db_livro:
+        raise HTTPException(status_code=404, detail="Livro não encontrado")
+    
+    # 3. Regra de Negócio: Não deletar se estiver emprestado
+    # Verificamos tanto o campo 'status' quanto a existência de empréstimos em aberto
+    if db_livro.status == StatusEnum.EMPRESTADO:
+        raise HTTPException(
+            status_code=400, 
+            detail="Não é possível remover um livro que está atualmente emprestado."
+        )
+
+    # 4. Executa a remoção
+    db.delete(db_livro)
+    db.commit()
+    return None
+
+# Membro Services
+def deletar_membro(db: Session, membro_id: int):
+    # 1. Busca o membro no banco
+    db_membro = db.query(Membro).filter(Membro.id == membro_id).first()
+    
+    # 2. Se não existir, levanta erro 404
+    if not db_membro:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    # 3. Verificação de integridade (Opcional para MVP, mas recomendada):
+    # Verifica se o membro possui empréstimos ativos antes de deletar
+    emprestimo_ativo = db.query(Emprestimo).filter(
+        Emprestimo.membro_id == membro_id, 
+        Emprestimo.data_devolucao_real == None
+    ).first()
+    
+    if emprestimo_ativo:
+        raise HTTPException(
+            status_code=400, 
+            detail="Não é possível deletar um membro com empréstimo pendente."
+        )
+
+    # 4. Deleta e commita
+    db.delete(db_membro)
+    db.commit()
+    return None # Retorno comum para status 204
+
+# Emprestimo Services ...
 def registrar_emprestimo(db: Session, emprestimo: EmprestimoCreate):
     livro = db.query(Livro).filter(Livro.id == emprestimo.livro_id).first()
     if not livro or livro.status != StatusEnum.DISPONIVEL:
@@ -85,6 +134,7 @@ def relatorio_emprestimos(db: Session):
         result.append(RelatorioEmprestimo(
             titulo=livro.titulo,
             nome_membro=membro.nome,
-            telefone=membro.telefone
+            telefone=membro.telefone,
+            data_emprestimo=emp.data_emprestimo
         ))
     return result
