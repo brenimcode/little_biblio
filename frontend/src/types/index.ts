@@ -18,7 +18,7 @@ export interface Member {
 
 export interface Loan {
   id?: number;
-  livro_id?: number;
+  livro_id: number;
   membro_id?: number;
   data_emprestimo: string;
   data_devolucao_prevista?: string;

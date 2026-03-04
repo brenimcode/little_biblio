@@ -56,7 +56,9 @@ class EmprestimoOut(EmprestimoBase):
         from_attributes = True
 
 class RelatorioEmprestimo(BaseModel):
+    id: int
     titulo: str
+    livro_id: int
     nome_membro: str
     telefone: str
     data_emprestimo: datetime

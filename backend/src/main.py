@@ -22,9 +22,9 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8081"],
+    allow_origins=["*"], # Permite que o React (qualquer porta) converse com a API
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["*"], # Permite todos os métodos (GET, POST, PATCH, DELETE, OPTIONS)
     allow_headers=["*"],
 )
 

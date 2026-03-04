@@ -132,8 +132,10 @@ def relatorio_emprestimos(db: Session):
     result = []
     for emp, livro, membro in query.all():
         result.append(RelatorioEmprestimo(
+            id=emp.id,
             titulo=livro.titulo,
             nome_membro=membro.nome,
+            livro_id=livro.id,
             telefone=membro.telefone,
             data_emprestimo=emp.data_emprestimo
         ))

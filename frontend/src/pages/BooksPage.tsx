@@ -4,7 +4,6 @@ import { Book } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Search, Plus, BookOpen, Edit, Trash2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { BookFormModal } from "@/components/BookFormModal";
@@ -15,16 +14,19 @@ const statusFilters = ["all", "DISPONIVEL", "EMPRESTADO"] as const;
 const statusLabels = { all: "Todos", DISPONIVEL: "Disponíveis", EMPRESTADO: "Emprestados" };
 
 const BooksPage = () => {
-  const { books, deleteBook, activeLoans, members, returnLoan, loading: loanLoading } = useLibrary();
+  const { books, deleteBook, activeLoans, members } = useLibrary();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<(typeof statusFilters)[number]>("all");
+  
+  // Estados de controle dos Modais
   const [editBook, setEditBook] = useState<Book | null>(null);
   const [loanBook, setLoanBook] = useState<Book | null>(null);
   const [returnBook, setReturnBook] = useState<Book | null>(null);
 
   const showAddModal = searchParams.get("action") === "add";
 
+  // Filtro de busca
   const filtered = books.filter((b) => {
     const matchesSearch =
       b.titulo.toLowerCase().includes(search.toLowerCase()) ||
@@ -33,13 +35,6 @@ const BooksPage = () => {
     const matchesStatus = statusFilter === "all" || b.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
-  const getLoanInfo = (bookId: number) => {
-    const loan = activeLoans.find((l) => l.livro_id === bookId);
-    if (!loan) return null;
-    const member = members.find((m) => m.id === loan.membro_id);
-    return { loan, member };
-  };
 
   return (
     <div className="space-y-6">
@@ -85,8 +80,10 @@ const BooksPage = () => {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((book) => {
+            // Busca a informação de quem está com o livro para exibir no card
             const loan = activeLoans.find((l) => l.livro_id === book.id);
             const member = loan ? members.find((m) => m.id === loan.membro_id) : null;
+            
             return (
               <Card key={book.id} className="overflow-hidden">
                 <div className="flex h-32 items-center justify-center bg-secondary">
@@ -108,11 +105,15 @@ const BooksPage = () => {
                     </span>
                   </div>
                   <p className="mb-3 text-sm text-muted-foreground">{book.autor}</p>
+                  
+                  {/* Exibe o nome de quem pegou o livro, se estiver emprestado */}
                   {book.status === "EMPRESTADO" && member && (
                     <p className="mb-3 text-xs text-muted-foreground">
                       Com: <span className="font-medium text-foreground">{member.nome}</span>
                     </p>
                   )}
+                  
+                  {/* Botões de Ação Refatorados */}
                   <div className="flex gap-2">
                     {book.status === "DISPONIVEL" ? (
                       <Button size="sm" className="flex-1" onClick={() => setLoanBook(book)}>
@@ -123,14 +124,9 @@ const BooksPage = () => {
                         size="sm"
                         variant="secondary"
                         className="flex-1"
-                        disabled={loanLoading}
-                        onClick={async () => {
-                          if (!loan) return;
-                          await returnLoan(loan.id);
-                          alert("Livro devolvido com sucesso e agora está disponível no acervo!");
-                        }}
+                        onClick={() => setReturnBook(book)}
                       >
-                        {loanLoading ? "Devolvendo..." : "Devolver"}
+                        Devolver
                       </Button>
                     )}
                     <Button size="icon" variant="ghost" onClick={() => setEditBook(book)}>
@@ -147,7 +143,7 @@ const BooksPage = () => {
         </div>
       )}
 
-      {/* Modals */}
+      {/* Modals (Aqui a mágica acontece) */}
       <BookFormModal
         open={showAddModal}
         onClose={() => setSearchParams({})}
