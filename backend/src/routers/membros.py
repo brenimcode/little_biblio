@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.database import SessionLocal
 from src.schemas.schemas import MembroCreate, MembroOut
-from src.services.services import criar_membro, listar_membros, deletar_membro
+from src.services.services import criar_membro, listar_membros, deletar_membro, atualizar_membro
 from typing import List
 
 def get_db():
@@ -26,3 +26,8 @@ def get_membros(db: Session = Depends(get_db)):
 @router.delete("/{membro_id}", status_code=204)
 def delete_membro(membro_id: int, db: Session = Depends(get_db)):
     return deletar_membro(db, membro_id)
+
+# PUT para editar membro
+@router.put("/{membro_id}", response_model=MembroOut)
+def put_membro(membro_id: int, membro: MembroCreate, db: Session = Depends(get_db)):
+    return atualizar_membro(db, membro_id, membro)

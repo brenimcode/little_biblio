@@ -45,6 +45,17 @@ def criar_membro(db: Session, membro: MembroCreate):
 def listar_membros(db: Session):
     return db.query(Membro).all()
 
+# Atualizar membro
+def atualizar_membro(db: Session, membro_id: int, membro: MembroCreate):
+    db_membro = db.query(Membro).filter(Membro.id == membro_id).first()
+    if not db_membro:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    for key, value in membro.dict().items():
+        setattr(db_membro, key, value)
+    db.commit()
+    db.refresh(db_membro)
+    return db_membro
+
 # Livro Services
 def deletar_livro(db: Session, livro_id: int):
     # 1. Busca o livro pelo ID

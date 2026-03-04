@@ -7,6 +7,9 @@ Este protótipo é um Mínimo Viável Produto (MVP) focado na validação da ló
 - Ambiente Único: O sistema é single-tenant, ou seja, não há separação entre diferentes bibliotecas. Todos os dados pertencem a um único contexto compartilhado.
 - Foco Funcional: Itens como monetização e segurança avançada foram omitidos para priorizar a experiência de rastreabilidade e usabilidade do core do produto.
 
+
+![alt text](image.png)
+
 ## 🛠 Stack Tecnológica
 
 - **Front-End:** ReactJS (Interface reativa e intuitiva)
