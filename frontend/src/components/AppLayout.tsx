@@ -18,7 +18,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex md:w-60 md:flex-col md:border-r md:bg-sidebar md:p-6">
         <div className="mb-8">
           <h1 className="flex items-center gap-2 text-xl font-bold text-sidebar-foreground">
-            <BookOpen className="h-6 w-6 text-primary" />
+            <img src="/favicon.png" alt="Little Biblio" className="h-14 w-14" />
             Little Biblio
           </h1>
         </div>
