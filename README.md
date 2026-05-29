@@ -8,6 +8,7 @@ Este protótipo é um Mínimo Viável Produto (MVP) focado na validação da ló
 - Foco Funcional: Itens como monetização e segurança avançada foram omitidos para priorizar a experiência de rastreabilidade e usabilidade do core do produto.
 
 
+
 ![alt text](image.png)
 
 ## 🛠 Stack Tecnológica
